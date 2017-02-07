@@ -72,6 +72,7 @@ import org.whispersystems.libaxolotl.util.guava.Optional;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * A view that displays an individual conversation item within a conversation
@@ -236,7 +237,7 @@ public class ConversationItem extends LinearLayout
     mediaThumbnail.setFocusable(!shouldInterceptClicks(messageRecord) && batchSelected.isEmpty());
     mediaThumbnail.setClickable(!shouldInterceptClicks(messageRecord) && batchSelected.isEmpty());
     mediaThumbnail.setLongClickable(batchSelected.isEmpty());
-    bodyText.setAutoLinkMask(batchSelected.isEmpty() ? Linkify.ALL : 0);
+    bodyText.setAutoLinkMask(0);
   }
 
   private boolean isCaptionlessMms(MessageRecord messageRecord) {
@@ -264,6 +265,12 @@ public class ConversationItem extends LinearLayout
     } else {
       bodyText.setText(messageRecord.getDisplayBody());
       bodyText.setVisibility(View.VISIBLE);
+    }
+
+    if (batchSelected.isEmpty()) {
+      Linkify.addLinks(bodyText, Pattern.compile("geo:[-0-9.]+,[-0-9.]+[^ \t\n\"\':]*"), null);
+      Linkify.addLinks(bodyText, Pattern.compile("xmpp:[^ \t\n\"\':,]+"), null);
+      Linkify.addLinks(bodyText, Linkify.ALL);
     }
   }
 
